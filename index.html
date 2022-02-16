@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>frames</title>
+    <script src="coi-serviceworker.js"></script>
+    <script src="https://unpkg.com/@ffmpeg/ffmpeg@0.10.0/dist/ffmpeg.min.js" crossorigin></script>
+    <style>
+      .item {
+        display: inline-block;
+        max-width: 32.8%;
+        margin: 0.2em;
+      }
+      .item img {
+        width: 100%;
+      }
+      .item figcaption {
+        margin: 0;
+      }
+
+      @media (max-width: 768px) {
+        .item {
+          max-width: 100%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="input">
+      <input type="text" name="url" />
+      <input type="file" name="animFile" accept=".mp4,.gif,.webm" />
+      <button type="submit">upload</button>
+    </div>
+    <p id="progressShow"></p>
+    <div id="frames"></div>
+    <template id="itemTemplate">
+      <figure class="item">
+        <img src="" />
+        <figcaption></figcaption>
+      </figure>
+    </template>
+    <script type="text/javascript">
+      let frames = document.querySelector("#frames");
+      let progressShow = document.querySelector("#progressShow");
+      const { createFFmpeg, fetchFile } = FFmpeg;
+      const ffmpeg = createFFmpeg({ log: true });
+
+      ffmpeg.setProgress((progress) => {
+        console.log(progress);
+      });
+      ffmpeg.setLogger((log) => {
+        //log.type: info, fferr, ffout
+        // console.log(log);
+        // if (log.type == "fferr") {
+        progressShow.textContent = log.message;
+        // }
+      });
+
+      document.querySelector("button").addEventListener("click", async () => {
+        if (!ffmpeg.isLoaded()) {
+          await ffmpeg.load();
+        }
+
+        frames.querySelectorAll("figure").forEach((figure) => {
+          URL.revokeObjectURL(figure.querySelector("img").src);
+          ffmpeg.FS("unlink", `${figure.querySelector("figcaption").textContent}.jpg`);
+        });
+        frames.replaceChildren();
+
+        let name = "input";
+        let input;
+        let file = document.querySelector("input[type='text']").value;
+
+        if (file) {
+          input = new Uint8Array(
+            await (
+              await fetch("https://d27lgm9mrrpaxd.cloudfront.net/proxy.php", {
+                method: "post",
+                headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                body: `url=${file}`,
+              })
+            ).arrayBuffer()
+          );
+        } else {
+          input = await fetchFile(document.querySelector("input[type='file']").files[0]);
+        }
+
+        ffmpeg.FS("writeFile", name, input);
+        await ffmpeg.run("-i", name, "%5d.jpg");
+
+        let i = 1;
+        while (true) {
+          let output = i.toString().padStart(5, "0");
+
+          try {
+            data = ffmpeg.FS("readFile", `${output}.jpg`);
+          } catch (err) {
+            break;
+          }
+
+          let template = document.querySelector("#itemTemplate").content.cloneNode(true);
+          let img = template.querySelector("img");
+          let caption = template.querySelector("figcaption");
+
+          img.src = URL.createObjectURL(new Blob([data.buffer], { type: "image/jpeg" }));
+          caption.textContent = output;
+          frames.append(template.firstElementChild);
+          i += 1;
+        }
+
+        progressShow.textContent = "";
+      });
+      // data = ffmpeg.FS('readFile', 'output.mp4');
+      // video = document.createElement("video");
+      // video.controls = true;
+      // video.autoplay = false;
+      // video.src = URL.createObjectURL(new Blob([data.buffer], { type: 'video/mp4' }));
+      // document.body.append(video);
+    </script>
+  </body>
+</html>
