@@ -12,7 +12,9 @@ const gifWidth = 360;
 const { createFFmpeg, fetchFile } = FFmpeg;
 const ffmpegs = [];
 while (ffmpegs.length < [...document.querySelectorAll("input[name='webp']")].at(-1).value) {
-  ffmpegs.push(createFFmpeg({ log: true }));
+  let ffmpeg = createFFmpeg({ log: true });
+  ffmpegs.push(ffmpeg);
+  ffmpeg.load();
 }
 
 fetch("list.json")
