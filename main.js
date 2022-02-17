@@ -11,7 +11,7 @@ const webpWidth = 720;
 const gifWidth = 360;
 const { createFFmpeg, fetchFile } = FFmpeg;
 const ffmpegs = [];
-while (ffmpegs.length < document.querySelectorAll("input[name='webp']").at(-1).value) {
+while (ffmpegs.length < [...document.querySelectorAll("input[name='webp']")].at(-1).value) {
   ffmpegs.push(createFFmpeg({ log: true }));
 }
 
@@ -605,4 +605,20 @@ function appendRestore() {
 function toggleInput(input, condition) {
   input.disabled = !condition;
   input.parentNode.style.color = condition ? "" : "gray";
+}
+
+if (!Array.prototype.at) {
+  Array.prototype.at = function (index) {
+    if (isNaN(index)) {
+      return undefined;
+    }
+
+    index = parseInt(index);
+
+    if (index < 0) {
+      index += this.length;
+    }
+
+    return this[index];
+  };
 }
