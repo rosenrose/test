@@ -388,6 +388,7 @@ async function getWebp(params, item) {
 
   ffmpeg.FS("mkdir", time);
   let downloadPromises = [];
+  let downloadCount = 0;
   for (let i = 0; i < duration; i++) {
     let filename = `${(cut + i).toString().padStart(5, "0")}.jpg`;
 
@@ -395,7 +396,7 @@ async function getWebp(params, item) {
       new Promise((resolve) => {
         fetchFile(`${cloud}/${title}/${filename}`).then((file) => {
           ffmpeg.FS("writeFile", `${time}/${filename}`, file);
-          caption.textContent = `${i + 1}/${duration} 다운로드`;
+          caption.textContent = `${++downloadCount}/${duration} 다운로드`;
           console.log("download", bar.value);
           bar.value += 1;
           resolve();
@@ -443,6 +444,7 @@ async function getWebp(params, item) {
   }
   ffmpeg.FS("unlink", `${time}/${outputName}`);
   ffmpeg.FS("rmdir", time);
+  ffmpeg.exit();
 
   if (!img.dataset.name) {
     img.addEventListener("click", (event) => {
