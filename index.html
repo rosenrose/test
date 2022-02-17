@@ -133,7 +133,7 @@
           downloadPromises.push(
             new Promise((resolve) => {
               fetchFile(`https://d2wwh0934dzo2k.cloudfront.net/ghibli/07 붉은 돼지 (1992)/${name}`).then((file) => {
-                ffmpeg.FS("writeFile", `${dir}/마 ${name}`, file);
+                ffmpeg.FS("writeFile", `${encodeURIComponent(dir)}/${encodeURIComponent(`마 ${name}`)}`, file);
                 resolve();
               });
             })
@@ -148,7 +148,7 @@
           "-pattern_type",
           "glob",
           "-i",
-          `${dir}/*.jpg`,
+          `${encodeURIComponent(dir)}/*.jpg`,
           "-vf",
           "scale=720:-1",
           "-loop",

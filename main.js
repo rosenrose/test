@@ -390,11 +390,11 @@ async function getWebp(params, item) {
       new Promise((resolve) => {
         fetchFile(`${cloud}/${title}/${filename}`).then((file) => {
           ffmpeg.FS("writeFile", `${time}/${filename}`, file);
+          caption.textContent = `${i + 1}/${duration} 다운로드`;
           resolve();
         });
       })
     );
-    caption.textContent = `${i + 1}/${duration} 다운로드`;
     bar.value += 1;
   }
 
@@ -416,7 +416,19 @@ async function getWebp(params, item) {
   );
 
   const output = ffmpeg.FS("readFile", `${time}/${encodeURIComponent(outputName)}`);
-  img.src = URL.createObjectURL(new Blob([output.buffer], { type: `image/${webpGif}` }));
+  const blob = new Blob([output.buffer], { type: `image/${webpGif}` });
+  img.src = URL.createObjectURL(blob);
+
+  let size = blob.size / 1024;
+  if (size > 1000) {
+    size /= 1024;
+    size = `${size.toFixed(1)}MB`;
+  } else {
+    size = `${size.toFixed(1)}KB`;
+  }
+
+  caption.textContent = size;
+  bar.hidden = true;
 
   for (let i = 0; i < duration; i++) {
     let filename = `${(cut + i).toString().padStart(5, "0")}.jpg`;
