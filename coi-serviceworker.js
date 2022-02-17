@@ -24,7 +24,7 @@ if (typeof window === "undefined") {
     event.respondWith(
       fetch(event.request)
         .then((response) => {
-          console.log(response);
+          console.log(event, response);
           if (response.status === 0) {
             return response;
           }
