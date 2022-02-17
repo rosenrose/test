@@ -17,6 +17,7 @@ if (typeof window === "undefined") {
   });
 
   self.addEventListener("fetch", function (event) {
+    console.log(event);
     if (event.request.cache === "only-if-cached" && event.request.mode !== "same-origin") {
       return;
     }
