@@ -410,51 +410,52 @@ async function getWebp(params, item) {
       ? ["-vf", `scale=${webpWidth}:-1`, "-loop", "0", "-preset", "drawing", "-qscale", "90"]
       : ["-lavfi", `split[a][b];[a]scale=${gifWidth}:-1,palettegen[p];[b]scale=${gifWidth}:-1[g];[g][p]paletteuse`];
 
-  await Promise.all(downloadPromises);
-  await ffmpeg.run(
-    "-framerate",
-    "12",
-    "-pattern_type",
-    "glob",
-    "-i",
-    `${time}/*.jpg`,
-    ...command,
-    `${time}/${outputName}`
-  );
+  Promise.all(downloadPromises).then(() => {
+    await ffmpeg.run(
+      "-framerate",
+      "12",
+      "-pattern_type",
+      "glob",
+      "-i",
+      `${time}/*.jpg`,
+      ...command,
+      `${time}/${outputName}` //output에서 utf-8 지원 안됨(FS는 가능)
+    );
 
-  const output = ffmpeg.FS("readFile", `${time}/${outputName}`);
-  const blob = new Blob([output.buffer], { type: `image/${webpGif}` });
-  img.src = URL.createObjectURL(blob);
+    const output = ffmpeg.FS("readFile", `${time}/${outputName}`);
+    const blob = new Blob([output.buffer], { type: `image/${webpGif}` });
+    img.src = URL.createObjectURL(blob);
 
-  let size = blob.size / 1024;
-  if (size > 1000) {
-    size /= 1024;
-    size = `${size.toFixed(1)}MB`;
-  } else {
-    size = `${size.toFixed(1)}KB`;
-  }
+    let size = blob.size / 1024;
+    if (size > 1000) {
+      size /= 1024;
+      size = `${size.toFixed(1)}MB`;
+    } else {
+      size = `${size.toFixed(1)}KB`;
+    }
 
-  caption.textContent = size;
-  bar.hidden = true;
+    caption.textContent = size;
+    bar.hidden = true;
 
-  for (let i = 0; i < duration; i++) {
-    let filename = `${(cut + i).toString().padStart(5, "0")}.jpg`;
+    for (let i = 0; i < duration; i++) {
+      let filename = `${(cut + i).toString().padStart(5, "0")}.jpg`;
 
-    ffmpeg.FS("unlink", `${time}/${filename}`);
-  }
-  ffmpeg.FS("unlink", `${time}/${outputName}`);
-  ffmpeg.FS("rmdir", time);
+      ffmpeg.FS("unlink", `${time}/${filename}`);
+    }
+    ffmpeg.FS("unlink", `${time}/${outputName}`);
+    ffmpeg.FS("rmdir", time);
 
-  if (!img.dataset.name) {
-    img.addEventListener("click", (event) => {
-      let name = event.target.dataset.name;
-      if (name) {
-        saveAs(event.target.src, name);
-      }
-    });
-  }
+    if (!img.dataset.name) {
+      img.addEventListener("click", (event) => {
+        let name = event.target.dataset.name;
+        if (name) {
+          saveAs(event.target.src, name);
+        }
+      });
+    }
 
-  img.dataset.name = decodeURIComponent(outputName);
+    img.dataset.name = decodeURIComponent(outputName);
+  });
 }
 
 window.addEventListener("error", (event) => {
