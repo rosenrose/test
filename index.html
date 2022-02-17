@@ -45,7 +45,7 @@
       let frames = document.querySelector("#frames");
       let progressShow = document.querySelector("#progressShow");
       const { createFFmpeg, fetchFile } = FFmpeg;
-      const ffmpeg = createFFmpeg({ log: true });
+      const ffmpeg = createFFmpeg({ log: false });
 
       (async () => {
         await ffmpeg.load();
@@ -56,7 +56,7 @@
       });
       ffmpeg.setLogger((log) => {
         //log.type: info, fferr, ffout
-        // console.log(log);
+        console.log(log);
         // if (log.type == "fferr") {
         progressShow.textContent = log.message;
         // }
