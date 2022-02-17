@@ -361,9 +361,10 @@ async function getWebp(params, item) {
   }
 
   ffmpeg.setProgress((progress) => {
-    if (progress.duration) {
+    if (progress.duration || progress.ratio === Infinity) {
       return;
     }
+
     console.log(trimName, progress);
     caption.textContent = `${(progress.ratio * 100).toFixed(1)}% / ${progress.time?.toFixed(2) || 0}s`;
     console.log("process", bar.value);
