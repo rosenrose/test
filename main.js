@@ -370,7 +370,10 @@ async function getWebp(params, item) {
   }
 
   ffmpeg.setProgress((progress) => {
-    console.log(progress);
+    // console.log(progress);
+    if (progress.duration) {
+      return;
+    }
     caption.textContent = `${(progress.ratio * 100).toFixed(1)}% / ${progress.time?.toFixed(2) || 0}s`;
     console.log("process", bar.value);
     bar.value = bar.max / 2 + Math.round((bar.max / 2) * progress.ratio);
@@ -380,7 +383,8 @@ async function getWebp(params, item) {
   // });
 
   const lastCut = cut + duration - 1;
-  const outputName = `${trimName}_${cut.toString().padStart(5, "0")}-${lastCut.toString().padStart(5, "0")}.${webpGif}`;
+  let outputName = `${trimName}_${cut.toString().padStart(5, "0")}-${lastCut.toString().padStart(5, "0")}.${webpGif}`;
+  outputName = encodeURIComponent(outputName);
 
   ffmpeg.FS("mkdir", time);
   let downloadPromises = [];
@@ -414,10 +418,10 @@ async function getWebp(params, item) {
     "-i",
     `${time}/*.jpg`,
     ...command,
-    `${time}/${encodeURIComponent(outputName)}`
+    `${time}/${outputName}`
   );
 
-  const output = ffmpeg.FS("readFile", `${time}/${encodeURIComponent(outputName)}`);
+  const output = ffmpeg.FS("readFile", `${time}/${outputName}`);
   const blob = new Blob([output.buffer], { type: `image/${webpGif}` });
   img.src = URL.createObjectURL(blob);
 
@@ -437,7 +441,7 @@ async function getWebp(params, item) {
 
     ffmpeg.FS("unlink", `${time}/${filename}`);
   }
-  ffmpeg.FS("unlink", `${time}/${encodeURIComponent(outputName)}`);
+  ffmpeg.FS("unlink", `${time}/${outputName}`);
   ffmpeg.FS("rmdir", time);
 
   if (!img.dataset.name) {
@@ -449,7 +453,7 @@ async function getWebp(params, item) {
     });
   }
 
-  img.dataset.name = outputName;
+  img.dataset.name = decodeURIComponent(outputName);
 }
 
 window.addEventListener("error", (event) => {
