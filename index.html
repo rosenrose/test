@@ -146,9 +146,9 @@
           "scale=720:-1",
           "-loop",
           "0",
-          `${dir}/${outputName}`
+          encodeURIComponent(`${dir}/${outputName}`)
         );
-        let webp = ffmpeg.FS("readFile", `${dir}/${outputName}`);
+        let webp = ffmpeg.FS("readFile", encodeURIComponent(`${dir}/${outputName}`));
         document.querySelector("#webp").src = URL.createObjectURL(new Blob([webp.buffer], { type: "image/webp" }));
       });
       // data = ffmpeg.FS('readFile', 'output.mp4');

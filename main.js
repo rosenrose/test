@@ -370,7 +370,8 @@ async function getWebp(params, item) {
   }
 
   ffmpeg.setProgress((progress) => {
-    caption.textContent = `${progress.ratio * 100}% / ${progress.duration}s`;
+    console.log(progress);
+    caption.textContent = `${(progress.ratio * 100).toFixed(1)}% / ${progress.duration}s`;
     bar.value = bar.max / 2 + Math.round((bar.max / 2) * progress.ratio);
   });
   // ffmpeg.setLogger((log) => {
@@ -378,7 +379,7 @@ async function getWebp(params, item) {
   // });
 
   const lastCut = cut + duration - 1;
-  let outputName = `${trimName}_${cut.toString().padStart(5, "0")}-${lastCut.toString().padStart(5, "0")}.${webpGif}`;
+  const outputName = `${trimName}_${cut.toString().padStart(5, "0")}-${lastCut.toString().padStart(5, "0")}.${webpGif}`;
 
   ffmpeg.FS("mkdir", time);
   for (let i = 0; i < duration; i++) {
