@@ -22,7 +22,7 @@ if (typeof window === "undefined") {
     }
 
     let corsRequest;
-    if (event.request.mode === "no-cors") {
+    if (event.request.mode === "no-cors" && event.request.destination === "image") {
       corsRequest = new Request(event.request.url, { mode: "cors" });
     }
 
