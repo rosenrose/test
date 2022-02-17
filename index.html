@@ -125,7 +125,7 @@
         let dir = "가 나 다";
         let outputName = "라마 a.webp";
 
-        ffmpeg.FS("mkdir", dir);
+        ffmpeg.FS("mkdir", encodeURIComponent(dir));
         let downloadPromises = [];
         for (let i = 0; i < 18; i++) {
           let name = `${(589 + i).toString().padStart(5, "0")}.jpg`;
