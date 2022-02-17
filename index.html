@@ -71,7 +71,7 @@
 
         //교체됨
         ffmpeg.setLogger((log) => {
-          console.log(log.message.split(" "));
+          console.log(log.type, log.message.split(" "));
         });
 
         let name = "input";
