@@ -6,9 +6,6 @@ const movieCheckbox = document.querySelector("#movieCheckbox");
 const runButton = document.querySelector("#run");
 const result = document.querySelector("#result");
 const cloud = "https://d2wwh0934dzo2k.cloudfront.net/ghibli";
-const protocol = new URL(document.URL).protocol;
-const decoder = new TextDecoder();
-const encoder = new TextEncoder();
 const fps = 12;
 const webpWidth = 720;
 const gifWidth = 360;
@@ -382,7 +379,6 @@ async function getWebp(params, item) {
 
   const lastCut = cut + duration - 1;
   let outputName = `${trimName}_${cut.toString().padStart(5, "0")}-${lastCut.toString().padStart(5, "0")}.${webpGif}`;
-  outputName = encodeURIComponent(outputName);
 
   ffmpeg.FS("mkdir", time);
   for (let i = 0; i < duration; i++) {
@@ -429,7 +425,7 @@ async function getWebp(params, item) {
     });
   }
 
-  img.dataset.name = decodeURIComponent(outputName);
+  img.dataset.name = outputName;
 }
 
 window.addEventListener("error", (event) => {
