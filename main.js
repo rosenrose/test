@@ -391,11 +391,11 @@ async function getWebp(params, item) {
         fetchFile(`${cloud}/${title}/${filename}`).then((file) => {
           ffmpeg.FS("writeFile", `${time}/${filename}`, file);
           caption.textContent = `${i + 1}/${duration} 다운로드`;
+          bar.value += 1;
           resolve();
         });
       })
     );
-    bar.value += 1;
   }
 
   const command =
