@@ -384,7 +384,7 @@ async function getWebp(params, item) {
   for (let i = 0; i < duration; i++) {
     let filename = `${(cut + i).toString().padStart(5, "0")}.jpg`;
 
-    ffmpeg.FS("writeFile", `${time}/${filename}`, `${cloud}/${title}/${filename}`);
+    ffmpeg.FS("writeFile", `${time}/${filename}`, await fetchFile(`${cloud}/${title}/${filename}`));
     caption.textContent = `${i + 1}/${duration} 다운로드`;
     bar.value += 1;
   }
