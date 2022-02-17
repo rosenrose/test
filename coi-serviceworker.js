@@ -23,6 +23,7 @@ if (typeof window === "undefined") {
 
     if (event.request.mode === "no-cors") {
       event.request.mode = "cors";
+      console.log("mode: ", event.request.mode);
     }
 
     event.respondWith(

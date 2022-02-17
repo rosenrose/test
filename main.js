@@ -405,10 +405,10 @@ async function getWebp(params, item) {
     "-i",
     `${time}/*.jpg`,
     ...command,
-    `${time}/${outputName}`
+    `"${time}/${outputName}"`
   );
 
-  const output = ffmpeg.FS("readFile", `${time}/${outputName}`);
+  const output = ffmpeg.FS("readFile", `"${time}/${outputName}"`);
   img.src = URL.createObjectURL(new Blob([output.buffer], { type: `image/${webpGif}` }));
 
   for (let i = 0; i < duration; i++) {
