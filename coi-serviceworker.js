@@ -1,12 +1,6 @@
 /*! coi-serviceworker v0.1.6 - Guido Zuidhof, licensed under MIT */
 if (typeof window === "undefined") {
-  self.addEventListener("install", (event) => {
-    event.waitUntil(
-      caches.open("v1").then((cache) => {
-        return cache.addAll(["https://unpkg.com/@ffmpeg/core@0.10.0/dist/ffmpeg-core.wasm"]);
-      })
-    );
-  });
+  self.addEventListener("install", () => self.skipWaiting());
   self.addEventListener("activate", (event) => event.waitUntil(self.clients.claim()));
 
   self.addEventListener("message", (ev) => {
@@ -32,32 +26,26 @@ if (typeof window === "undefined") {
     if (event.request.mode === "no-cors" && event.request.destination === "image") {
       corsRequest = new Request(event.request.url, { mode: "cors" });
     }
-    let request = corsRequest || event.request;
 
-    event.respondWith(async () => {
-      const cachedResponse = await caches.match(request);
-      console.log(cachedResponse);
+    event.respondWith(
+      fetch(corsRequest || event.request)
+        .then((response) => {
+          if (response.status === 0) {
+            return response;
+          }
 
-      return cachedResponse
-        ? cachedResponse
-        : fetch(request)
-            .then((response) => {
-              if (response.status === 0) {
-                return response;
-              }
+          const newHeaders = new Headers(response.headers);
+          newHeaders.set("Cross-Origin-Embedder-Policy", "require-corp");
+          newHeaders.set("Cross-Origin-Opener-Policy", "same-origin");
 
-              const newHeaders = new Headers(response.headers);
-              newHeaders.set("Cross-Origin-Embedder-Policy", "require-corp");
-              newHeaders.set("Cross-Origin-Opener-Policy", "same-origin");
-
-              return new Response(response.body, {
-                status: response.status,
-                statusText: response.statusText,
-                headers: newHeaders,
-              });
-            })
-            .catch((e) => console.error(e));
-    });
+          return new Response(response.body, {
+            status: response.status,
+            statusText: response.statusText,
+            headers: newHeaders,
+          });
+        })
+        .catch((e) => console.error(e))
+    );
   });
 } else {
   (() => {
