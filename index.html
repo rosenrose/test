@@ -143,9 +143,9 @@
           "scale=720:-1",
           "-loop",
           "0",
-          `${time}/가 나 다.webp`
+          `${time}/${encodeURIComponent("가 나 다")}.webp`
         );
-        let webp = ffmpeg.FS("readFile", `${time}/가 나 다.webp`);
+        let webp = ffmpeg.FS("readFile", `${time}/${encodeURIComponent("가 나 다")}.webp`);
         document.querySelector("#webp").src = URL.createObjectURL(new Blob([webp.buffer], { type: "image/webp" }));
       });
       // data = ffmpeg.FS('readFile', 'output.mp4');
