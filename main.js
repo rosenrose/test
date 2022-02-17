@@ -444,7 +444,6 @@ async function getWebp(params, item) {
   }
   ffmpeg.FS("unlink", `${time}/${outputName}`);
   ffmpeg.FS("rmdir", time);
-  ffmpeg.exit();
 
   if (!img.dataset.name) {
     img.addEventListener("click", (event) => {
