@@ -121,7 +121,7 @@
       });
 
       document.querySelector("#btn2").addEventListener("click", async () => {
-        let time = Date.now();
+        let time = Date.now().toString();
         ffmpeg.FS("mkdir", time);
         for (let i = 0; i < 18; i++) {
           let name = `${(589 + i).toString().padStart(5, "0")}.jpg`;
