@@ -64,17 +64,17 @@
         console.log(progress);
       });
 
+      //교체됨
+      ffmpeg.setLogger((log) => {
+        console.log(log.type, log.message.split(" "));
+      });
+
       document.querySelector("#btn1").addEventListener("click", async () => {
         frames.querySelectorAll("figure").forEach((figure) => {
           URL.revokeObjectURL(figure.querySelector("img").src);
           ffmpeg.FS("unlink", `${figure.querySelector("figcaption").textContent}.jpg`);
         });
         frames.replaceChildren();
-
-        //교체됨
-        ffmpeg.setLogger((log) => {
-          console.log(log.type, log.message.split(" "));
-        });
 
         let name = "input";
         let input;
