@@ -36,6 +36,7 @@ if (typeof window === "undefined") {
 
     event.respondWith(async () => {
       const cachedResponse = await caches.match(request);
+      console.log(cachedResponse);
 
       return cachedResponse
         ? cachedResponse
