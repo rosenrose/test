@@ -355,7 +355,7 @@ document.querySelectorAll("input[checked], select").forEach((input) => {
 });
 
 async function getWebp(params, item) {
-  const ffmpeg = createFFmpeg({ log: false });
+  const ffmpeg = createFFmpeg({ log: true });
   await ffmpeg.load();
   const { time, title, cut, duration, trimName, webpGif } = params;
   const img = item.querySelector("img");

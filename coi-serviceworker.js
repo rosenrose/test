@@ -21,6 +21,10 @@ if (typeof window === "undefined") {
       return;
     }
 
+    if (event.request.mode === "no-cors") {
+      event.request.mode = "cors";
+    }
+
     event.respondWith(
       fetch(event.request)
         .then((response) => {
