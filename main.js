@@ -10,6 +10,10 @@ const fps = 12;
 const webpWidth = 720;
 const gifWidth = 360;
 const { createFFmpeg, fetchFile } = FFmpeg;
+const ffmpegs = [];
+while (ffmpegs.length < document.querySelectorAll("input[name='webp']").at(-1).value) {
+  ffmpegs.push(createFFmpeg({ log: true }));
+}
 
 fetch("list.json")
   .then((response) => response.json())
@@ -249,6 +253,7 @@ rub_webp.addEventListener("click", () => {
         duration: lastCut - cut + 1,
         trimName,
         webpGif,
+        iter: 0,
       },
       webpItem
     );
@@ -283,6 +288,7 @@ runButton.addEventListener("click", () => {
           duration,
           trimName,
           webpGif,
+          iter: i,
         },
         items[i]
       );
@@ -343,9 +349,11 @@ document.querySelectorAll("input[checked], select").forEach((input) => {
 });
 
 async function getWebp(params, item) {
-  const ffmpeg = createFFmpeg({ log: true });
-  await ffmpeg.load();
-  const { time, title, cut, duration, trimName, webpGif } = params;
+  const { time, title, cut, duration, trimName, webpGif, iter } = params;
+  const ffmpeg = ffmpegs[iter];
+  if (!ffmpeg.isLoaded()) {
+    await ffmpeg.load();
+  }
   const img = item.querySelector("img");
   const caption = item.querySelector("figcaption");
   const bar = item.querySelector("progress");
