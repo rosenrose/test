@@ -364,7 +364,7 @@ async function getWebp(params, item) {
     if (progress.duration) {
       return;
     }
-    console.log(progress);
+    console.log(trimName, progress);
     caption.textContent = `${(progress.ratio * 100).toFixed(1)}% / ${progress.time?.toFixed(2) || 0}s`;
     console.log("process", bar.value);
     bar.value = bar.max / 2 + Math.round((bar.max / 2) * progress.ratio);
