@@ -410,7 +410,7 @@ async function getWebp(params, item) {
       ? ["-vf", `scale=${webpWidth}:-1`, "-loop", "0", "-preset", "drawing", "-qscale", "90"]
       : ["-lavfi", `split[a][b];[a]scale=${gifWidth}:-1,palettegen[p];[b]scale=${gifWidth}:-1[g];[g][p]paletteuse`];
 
-  Promise.all(downloadPromises).then(() => {
+  Promise.all(downloadPromises).then(async () => {
     await ffmpeg.run(
       "-framerate",
       "12",
