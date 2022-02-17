@@ -29,7 +29,6 @@ if (typeof window === "undefined") {
     event.respondWith(
       fetch(corsRequest || event.request)
         .then((response) => {
-          console.log(corsRequest || event.request, response);
           if (response.status === 0) {
             return response;
           }

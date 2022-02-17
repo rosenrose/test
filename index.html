@@ -47,7 +47,7 @@
       let frames = document.querySelector("#frames");
       let progressShow = document.querySelector("#progressShow");
       const { createFFmpeg, fetchFile } = FFmpeg;
-      const ffmpeg = createFFmpeg({ log: false });
+      const ffmpeg = createFFmpeg({ log: true });
 
       ffmpeg.setLogger((log) => {
         //log.type: info, fferr, ffout
@@ -143,9 +143,9 @@
           "scale=720:-1",
           "-loop",
           "0",
-          `${time}/webp.webp`
+          `${time}/webp a b.webp`
         );
-        let webp = ffmpeg.FS("readFile", `${time}/webp.webp`);
+        let webp = ffmpeg.FS("readFile", `${time}/webp a b.webp`);
         document.querySelector("#webp").src = URL.createObjectURL(new Blob([webp.buffer], { type: "image/webp" }));
       });
       // data = ffmpeg.FS('readFile', 'output.mp4');
