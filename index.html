@@ -49,7 +49,7 @@
 
       ffmpeg.setLogger((log) => {
         //log.type: info, fferr, ffout
-        console.log("AAA--" + log);
+        console.log("AAA--", log);
         // if (log.type == "fferr") {
         progressShow.textContent = log.message;
         // }
@@ -70,7 +70,7 @@
         frames.replaceChildren();
 
         ffmpeg.setLogger((log) => {
-          console.log("BBB--" + log);
+          console.log("BBB--", log);
         });
 
         let name = "input";
