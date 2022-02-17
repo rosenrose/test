@@ -371,7 +371,8 @@ async function getWebp(params, item) {
 
   ffmpeg.setProgress((progress) => {
     console.log(progress);
-    caption.textContent = `${(progress.ratio * 100).toFixed(1)}% / ${progress.time}s`;
+    caption.textContent = `${(progress.ratio * 100).toFixed(1)}% / ${progress.time?.toFixed(2) || 0}s`;
+    console.log("process", bar.value);
     bar.value = bar.max / 2 + Math.round((bar.max / 2) * progress.ratio);
   });
   // ffmpeg.setLogger((log) => {
@@ -391,6 +392,7 @@ async function getWebp(params, item) {
         fetchFile(`${cloud}/${title}/${filename}`).then((file) => {
           ffmpeg.FS("writeFile", `${time}/${filename}`, file);
           caption.textContent = `${i + 1}/${duration} 다운로드`;
+          console.log("download", bar.value);
           bar.value += 1;
           resolve();
         });
