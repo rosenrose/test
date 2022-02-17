@@ -162,9 +162,11 @@ slider.addEventListener("change", (event) => {
   } else {
     let cut = event.target.value;
     sliderSelect.querySelector("#goto").value = parseInt(cut);
+
     let requestURL = `${cloud}/${allList[movie].name}/${cut.padStart(5, "0")}.jpg`;
-    fetch(requestURL);
-    sliderImage.src = requestURL;
+    fetch(requestURL).then(() => {
+      sliderImage.src = requestURL;
+    });
   }
 });
 sliderSelect.querySelector("button#prev").addEventListener("click", () => {
@@ -277,8 +279,11 @@ runButton.addEventListener("click", () => {
         .toString()
         .padStart(5, "0");
       let requestURL = `${cloud}/${title.name}/${cut}.jpg`;
-      fetch(requestURL); //Access-Control-Allow-Origin 헤더를 추가하기 위함. image.src로 먼저 로드하면 cors 헤더가 추가되지 않은 상태로 캐싱됨.
-      image.src = requestURL;
+
+      //Access-Control-Allow-Origin 헤더를 추가하기 위함. image.src로 먼저 로드하면 cors 헤더가 추가되지 않은 상태로 캐싱됨.
+      fetch(requestURL).then(() => {
+        image.src = requestURL;
+      });
     } else if (format == "webp") {
       cut = getRandomInt(1, title.cut + 1 - duration);
 
@@ -357,7 +362,7 @@ async function getWebp(params, item) {
   const caption = item.querySelector("figcaption");
   const bar = item.querySelector("progress");
 
-  caption.textContent = `0/${params.duration} 다운로드`;
+  caption.textContent = `0/${duration} 다운로드`;
   bar.max = duration * 2;
   bar.value = 0;
   bar.hidden = false;
@@ -379,7 +384,7 @@ async function getWebp(params, item) {
   const outputName = `${trimName}_${cut.toString().padStart(5, "0")}-${lastCut.toString().padStart(5, "0")}.${webpGif}`;
 
   ffmpeg.FS("mkdir", time);
-  for (let i = 0; i < params.duration; i++) {
+  for (let i = 0; i < duration; i++) {
     let filename = `${(cut + i).toString().padStart(5, "0")}.jpg`;
 
     ffmpeg.FS("writeFile", `${time}/${filename}`, `${cloud}/${title}/${filename}`);
@@ -405,6 +410,14 @@ async function getWebp(params, item) {
 
   const output = ffmpeg.FS("readFile", `${time}/${outputName}`);
   img.src = URL.createObjectURL(new Blob([output.buffer], { type: `image/${webpGif}` }));
+
+  for (let i = 0; i < duration; i++) {
+    let filename = `${(cut + i).toString().padStart(5, "0")}.jpg`;
+
+    ffmpeg.FS("unlink", `${time}/${filename}`);
+  }
+  ffmpeg.FS("unlink", `${time}/${outputName}`);
+  ffmpeg.FS("rmdir", time);
 
   if (!img.dataset.name) {
     img.addEventListener("click", (event) => {
