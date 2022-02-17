@@ -126,15 +126,22 @@
         let outputName = "라마 a.webp";
 
         ffmpeg.FS("mkdir", dir);
+        let downloadPromises = [];
         for (let i = 0; i < 18; i++) {
           let name = `${(589 + i).toString().padStart(5, "0")}.jpg`;
-          ffmpeg.FS(
-            "writeFile",
-            `${dir}/마 ${name}`,
-            await fetchFile(`https://d2wwh0934dzo2k.cloudfront.net/ghibli/07 붉은 돼지 (1992)/${name}`)
+
+          downloadPromises.push(
+            new Promise((resolve) => {
+              fetchFile(`https://d2wwh0934dzo2k.cloudfront.net/ghibli/07 붉은 돼지 (1992)/${name}`).then((file) => {
+                ffmpeg.FS("writeFile", `${dir}/마 ${name}`, file);
+                resolve();
+              });
+            })
           );
           console.log(name);
         }
+
+        await Promise.all(downloadPromises);
         await ffmpeg.run(
           "-framerate",
           "12",

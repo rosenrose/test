@@ -370,8 +370,7 @@ async function getWebp(params, item) {
   }
 
   ffmpeg.setProgress((progress) => {
-    console.log(progress);
-    caption.textContent = `${(progress.ratio * 100).toFixed(1)}% / ${progress.duration}s`;
+    caption.textContent = `${(progress.ratio * 100).toFixed(1)}% / ${progress.time}s`;
     bar.value = bar.max / 2 + Math.round((bar.max / 2) * progress.ratio);
   });
   // ffmpeg.setLogger((log) => {
@@ -382,10 +381,18 @@ async function getWebp(params, item) {
   const outputName = `${trimName}_${cut.toString().padStart(5, "0")}-${lastCut.toString().padStart(5, "0")}.${webpGif}`;
 
   ffmpeg.FS("mkdir", time);
+  let downloadPromises = [];
   for (let i = 0; i < duration; i++) {
     let filename = `${(cut + i).toString().padStart(5, "0")}.jpg`;
 
-    ffmpeg.FS("writeFile", `${time}/${filename}`, await fetchFile(`${cloud}/${title}/${filename}`));
+    downloadPromises.push(
+      new Promise((resolve) => {
+        fetchFile(`${cloud}/${title}/${filename}`).then((file) => {
+          ffmpeg.FS("writeFile", `${time}/${filename}`, file);
+          resolve();
+        });
+      })
+    );
     caption.textContent = `${i + 1}/${duration} 다운로드`;
     bar.value += 1;
   }
@@ -395,6 +402,7 @@ async function getWebp(params, item) {
       ? ["-vf", `scale=${webpWidth}:-1`, "-loop", "0", "-preset", "drawing", "-qscale", "90"]
       : ["-lavfi", `split[a][b];[a]scale=${gifWidth}:-1,palettegen[p];[b]scale=${gifWidth}:-1[g];[g][p]paletteuse`];
 
+  await Promise.all(downloadPromises);
   await ffmpeg.run(
     "-framerate",
     "12",
