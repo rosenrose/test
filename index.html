@@ -47,19 +47,19 @@
       const { createFFmpeg, fetchFile } = FFmpeg;
       const ffmpeg = createFFmpeg({ log: false });
 
+      ffmpeg.setLogger((log) => {
+        //log.type: info, fferr, ffout
+        console.log("AAA--" + log);
+        // if (log.type == "fferr") {
+        progressShow.textContent = log.message;
+        // }
+      });
       (async () => {
         await ffmpeg.load();
       })();
 
       ffmpeg.setProgress((progress) => {
         console.log(progress);
-      });
-      ffmpeg.setLogger((log) => {
-        //log.type: info, fferr, ffout
-        console.log(log);
-        // if (log.type == "fferr") {
-        progressShow.textContent = log.message;
-        // }
       });
 
       document.querySelector("button").addEventListener("click", async () => {
@@ -68,6 +68,10 @@
           ffmpeg.FS("unlink", `${figure.querySelector("figcaption").textContent}.jpg`);
         });
         frames.replaceChildren();
+
+        ffmpeg.setLogger((log) => {
+          console.log("BBB--" + log);
+        });
 
         let name = "input";
         let input;
