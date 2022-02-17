@@ -411,16 +411,26 @@ async function getWebp(params, item) {
       : ["-lavfi", `split[a][b];[a]scale=${gifWidth}:-1,palettegen[p];[b]scale=${gifWidth}:-1[g];[g][p]paletteuse`];
 
   Promise.all(downloadPromises)
-    .then(() => {
-      new Promise((resolve) => {
-        //output에서 utf-8 지원 안됨(FS는 가능)
-        ffmpeg
-          .run("-framerate", "12", "-pattern_type", "glob", "-i", `${time}/*.jpg`, ...command, `${time}/${outputName}`)
-          .then(() => {
-            resolve();
-          });
-      });
-    })
+    .then(
+      () =>
+        new Promise((resolve) => {
+          //output에서 utf-8 지원 안됨(FS는 가능)
+          ffmpeg
+            .run(
+              "-framerate",
+              "12",
+              "-pattern_type",
+              "glob",
+              "-i",
+              `${time}/*.jpg`,
+              ...command,
+              `${time}/${outputName}`
+            )
+            .then(() => {
+              resolve();
+            });
+        })
+    )
     .then(() => {
       const output = ffmpeg.FS("readFile", `${time}/${outputName}`);
       const blob = new Blob([output.buffer], { type: `image/${webpGif}` });
