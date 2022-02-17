@@ -47,6 +47,10 @@
       const { createFFmpeg, fetchFile } = FFmpeg;
       const ffmpeg = createFFmpeg({ log: true });
 
+      (async () => {
+        await ffmpeg.load();
+      })();
+
       ffmpeg.setProgress((progress) => {
         console.log(progress);
       });
@@ -59,10 +63,6 @@
       });
 
       document.querySelector("button").addEventListener("click", async () => {
-        if (!ffmpeg.isLoaded()) {
-          await ffmpeg.load();
-        }
-
         frames.querySelectorAll("figure").forEach((figure) => {
           URL.revokeObjectURL(figure.querySelector("img").src);
           ffmpeg.FS("unlink", `${figure.querySelector("figcaption").textContent}.jpg`);
