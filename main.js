@@ -350,6 +350,7 @@ document.querySelectorAll("input[checked], select").forEach((input) => {
 
 async function getWebp(params, item) {
   const { time, title, cut, duration, trimName, webpGif, iter } = params;
+  console.log(trimName, iter);
   const ffmpeg = ffmpegs[iter];
   if (!ffmpeg.isLoaded()) {
     await ffmpeg.load();
