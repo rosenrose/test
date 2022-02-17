@@ -127,8 +127,9 @@
 
         ffmpeg.FS("mkdir", encodeURIComponent(dir));
         let downloadPromises = [];
+        let rand = getRandomInt(100, 1000);
         for (let i = 0; i < 18; i++) {
-          let name = `${(589 + i).toString().padStart(5, "0")}.jpg`;
+          let name = `${(rand + i).toString().padStart(5, "0")}.jpg`;
 
           downloadPromises.push(
             new Promise((resolve) => {
@@ -164,6 +165,9 @@
       // video.autoplay = false;
       // video.src = URL.createObjectURL(new Blob([data.buffer], { type: 'video/mp4' }));
       // document.body.append(video);
+      function getRandomInt(minInclude, maxExclude) {
+        return Math.floor(Math.random() * (maxExclude - minInclude)) + minInclude;
+      }
     </script>
   </body>
 </html>
