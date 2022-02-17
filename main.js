@@ -381,7 +381,8 @@ async function getWebp(params, item) {
   // });
 
   const lastCut = cut + duration - 1;
-  const outputName = `${trimName}_${cut.toString().padStart(5, "0")}-${lastCut.toString().padStart(5, "0")}.${webpGif}`;
+  let outputName = `${trimName}_${cut.toString().padStart(5, "0")}-${lastCut.toString().padStart(5, "0")}.${webpGif}`;
+  outputName = encodeURIComponent(outputName);
 
   ffmpeg.FS("mkdir", time);
   for (let i = 0; i < duration; i++) {
@@ -405,10 +406,10 @@ async function getWebp(params, item) {
     "-i",
     `${time}/*.jpg`,
     ...command,
-    `"${time}/${outputName}"`
+    `${time}/${outputName}`
   );
 
-  const output = ffmpeg.FS("readFile", `"${time}/${outputName}"`);
+  const output = ffmpeg.FS("readFile", `${time}/${outputName}`);
   img.src = URL.createObjectURL(new Blob([output.buffer], { type: `image/${webpGif}` }));
 
   for (let i = 0; i < duration; i++) {
@@ -428,7 +429,7 @@ async function getWebp(params, item) {
     });
   }
 
-  img.dataset.name = outputName;
+  img.dataset.name = decodeURIComponent(outputName);
 }
 
 window.addEventListener("error", (event) => {
