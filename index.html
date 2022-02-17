@@ -122,7 +122,7 @@
 
       document.querySelector("#btn2").addEventListener("click", async () => {
         let time = Date.now().toString();
-        let dir = "가 나 다";
+        let dir = time + "가 나 다";
         let outputName = "라마 a.webp";
 
         ffmpeg.FS("mkdir", encodeURIComponent(dir));
