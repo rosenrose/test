@@ -50,7 +50,7 @@
       let frames = document.querySelector("#frames");
       let progressShow = document.querySelector("#progressShow");
       const { createFFmpeg, fetchFile } = FFmpeg;
-      const ffmpeg = createFFmpeg({ log: true });
+      const ffmpeg = createFFmpeg({ log: true, corePath: "./ffmpeg-core.js" });
 
       ffmpeg.setLogger((log) => {
         //log.type: info, fferr, ffout
