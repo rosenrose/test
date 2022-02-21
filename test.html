@@ -5,12 +5,16 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <script src="http://ec2-15-165-219-179.ap-northeast-2.compute.amazonaws.com:5000/socket.io/socket.io.js"></script>
+    <script src="https://dslup9jwtcjjs.cloudfront.net/socket.io/socket.io.js"></script>
     <title>Document</title>
   </head>
   <body>
     <script type="module">
       const socket = io();
+      socket.emit("a", "a");
+      socket.on("b", (msg) => {
+        console.log("msg", msg);
+      });
     </script>
   </body>
 </html>
