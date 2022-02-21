@@ -3,19 +3,16 @@
   <head>
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <!-- <script src="https://dslup9jwtcjjs.cloudfront.net/socket.io/socket.io.js" crossorigin=""></script> -->
+    <script src="https://ghibli-webp.herokuapp.com/socket.io/socket.io.js"></script>
     <title>Document</title>
   </head>
   <body>
     <script type="module">
-      import { io } from "https://cdn.socket.io/4.3.2/socket.io.esm.min.js";
-      const socket = io("https://dslup9jwtcjjs.cloudfront.net");
-      socket.emit("a", "a");
-      socket.on("b", (msg) => {
-        console.log("msg", msg);
-      });
+      // import { io } from "https://cdn.socket.io/4.3.2/socket.io.esm.min.js";
+      // const socket = io("https://dslup9jwtcjjs.cloudfront.net");
+      const socket = io();
+      socket.emit("webp", (webp) => console.log(webp));
     </script>
   </body>
 </html>
