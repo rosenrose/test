@@ -11,7 +11,7 @@
     <script type="module">
       // import { io } from "https://cdn.socket.io/4.3.2/socket.io.esm.min.js";
       // const socket = io("https://dslup9jwtcjjs.cloudfront.net");
-      const socket = io();
+      const socket = io("https://ghibli-webp.herokuapp.com");
       socket.emit("webp", (webp) => console.log(webp));
     </script>
   </body>
