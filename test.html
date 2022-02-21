@@ -9,7 +9,7 @@
     <title>Document</title>
   </head>
   <body>
-    <script type="module">
+    <script>
       const socket = io();
       socket.emit("a", "a");
       socket.on("b", (msg) => {
