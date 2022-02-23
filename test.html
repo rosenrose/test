@@ -4,14 +4,14 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <script src="https://ghibli-webp.herokuapp.com/socket.io/socket.io.js"></script>
+    <script src="https://rosenrose-ghibli-webp.herokuapp.com/socket.io/socket.io.min.js"></script>
     <title>Document</title>
   </head>
   <body>
-    <script type="module">
+    <script>
       // import { io } from "https://cdn.socket.io/4.3.2/socket.io.esm.min.js";
       // const socket = io("https://dslup9jwtcjjs.cloudfront.net");
-      const socket = io("https://ghibli-webp.herokuapp.com");
+      const socket = io("wss://rosenrose-ghibli-webp.herokuapp.com");
       socket.emit("webp", (webp) => console.log(webp));
     </script>
   </body>

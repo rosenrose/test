@@ -175,6 +175,8 @@
           `${time}/${outputName}`
         );
         let webp = ffmpegs[num].FS("readFile", `${time}/${outputName}`);
+        dir = ffmpegs[num].FS("readdir", time);
+        console.log("dir", dir);
         document.querySelector(`#webp${num}`).src = URL.createObjectURL(
           new Blob([webp.buffer], { type: "image/webp" })
         );
