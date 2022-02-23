@@ -17,13 +17,13 @@ if (typeof window === "undefined") {
   });
 
   self.addEventListener("fetch", function (event) {
-    console.log(event);
     if (event.request.cache === "only-if-cached" && event.request.mode !== "same-origin") {
       return;
     }
 
+    console.log(event);
     let corsRequest;
-    if (event.request.mode === "no-cors" && event.request.destination === "image") {
+    if (event.request.url.includes("d2wwh0934dzo2k.cloudfront.net") && event.request.mode === "no-cors") {
       corsRequest = new Request(event.request.url, { mode: "cors" });
     }
 

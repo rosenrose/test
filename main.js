@@ -11,11 +11,10 @@ const webpWidth = 720;
 const gifWidth = 360;
 const { createFFmpeg, fetchFile } = FFmpeg;
 const ffmpegs = [];
-while (ffmpegs.length < [...document.querySelectorAll("input[name='webp']")].at(-1).value) {
-  let ffmpeg = createFFmpeg({ log: true });
-  ffmpegs.push(ffmpeg);
-  ffmpeg.load();
+for (let i = 0; i < 2; i++) {
+  ffmpegs.push(createFFmpeg({ log: true }));
 }
+ffmpegs[0].load();
 
 fetch("list.json")
   .then((response) => response.json())
@@ -352,11 +351,6 @@ document.querySelectorAll("input[checked], select").forEach((input) => {
 
 async function getWebp(params, item) {
   const { time, title, cut, duration, trimName, webpGif, iter } = params;
-  console.log(trimName, iter);
-  const ffmpeg = ffmpegs[iter];
-  if (!ffmpeg.isLoaded()) {
-    await ffmpeg.load();
-  }
   const img = item.querySelector("img");
   const caption = item.querySelector("figcaption");
   const bar = item.querySelector("progress");
@@ -376,9 +370,7 @@ async function getWebp(params, item) {
       return;
     }
 
-    console.log(trimName, progress);
     caption.textContent = `${(progress.ratio * 100).toFixed(1)}% / ${progress.time?.toFixed(2) || 0}s`;
-    console.log("process", bar.value);
     bar.value = bar.max / 2 + Math.round((bar.max / 2) * progress.ratio);
   });
   // ffmpeg.setLogger((log) => {
@@ -400,7 +392,6 @@ async function getWebp(params, item) {
         fetchFile(`${cloud}/${title}/${filename}`).then((file) => {
           ffmpeg.FS("writeFile", `${time}/${filename}`, file);
           caption.textContent = `${++downloadCount}/${duration} 다운로드`;
-          console.log("download", bar.value);
           bar.value += 1;
           resolve();
         });
@@ -413,62 +404,52 @@ async function getWebp(params, item) {
       ? ["-vf", `scale=${webpWidth}:-1`, "-loop", "0", "-preset", "drawing", "-qscale", "90"]
       : ["-lavfi", `split[a][b];[a]scale=${gifWidth}:-1,palettegen[p];[b]scale=${gifWidth}:-1[g];[g][p]paletteuse`];
 
-  Promise.all(downloadPromises)
-    .then(
-      () =>
-        new Promise((resolve) => {
-          //output에서 utf-8 지원 안됨(FS는 가능)
-          ffmpeg
-            .run(
-              "-framerate",
-              "12",
-              "-pattern_type",
-              "glob",
-              "-i",
-              `${time}/*.jpg`,
-              ...command,
-              `${time}/${outputName}`
-            )
-            .then(() => {
-              resolve();
-            });
-        })
-    )
-    .then(() => {
-      const output = ffmpeg.FS("readFile", `${time}/${outputName}`);
-      const blob = new Blob([output.buffer], { type: `image/${webpGif}` });
-      img.src = URL.createObjectURL(blob);
+  await Promise.all(downloadPromises);
+  await ffmpeg.run(
+    "-framerate",
+    "12",
+    "-pattern_type",
+    "glob",
+    "-i",
+    `${time}/*.jpg`,
+    ...command,
+    `${time}/${outputName}` //output에서 utf-8 지원 안됨(FS는 가능)
+  );
 
-      let size = blob.size / 1024;
-      if (size > 1000) {
-        size /= 1024;
-        size = `${size.toFixed(1)}MB`;
-      } else {
-        size = `${size.toFixed(1)}KB`;
+  const output = ffmpeg.FS("readFile", `${time}/${outputName}`);
+  const blob = new Blob([output.buffer], { type: `image/${webpGif}` });
+  img.src = URL.createObjectURL(blob);
+
+  let size = blob.size / 1024;
+  if (size > 1000) {
+    size /= 1024;
+    size = `${size.toFixed(1)}MB`;
+  } else {
+    size = `${size.toFixed(1)}KB`;
+  }
+
+  caption.textContent = size;
+  bar.hidden = true;
+
+  for (let i = 0; i < duration; i++) {
+    let filename = `${(cut + i).toString().padStart(5, "0")}.jpg`;
+
+    ffmpeg.FS("unlink", `${time}/${filename}`);
+  }
+  ffmpeg.FS("unlink", `${time}/${outputName}`);
+  ffmpeg.FS("rmdir", time);
+  ffmpeg.exit();
+
+  if (!img.dataset.name) {
+    img.addEventListener("click", (event) => {
+      let name = event.target.dataset.name;
+      if (name) {
+        saveAs(event.target.src, name);
       }
-
-      caption.textContent = size;
-      bar.hidden = true;
-
-      for (let i = 0; i < duration; i++) {
-        let filename = `${(cut + i).toString().padStart(5, "0")}.jpg`;
-
-        ffmpeg.FS("unlink", `${time}/${filename}`);
-      }
-      ffmpeg.FS("unlink", `${time}/${outputName}`);
-      ffmpeg.FS("rmdir", time);
-
-      if (!img.dataset.name) {
-        img.addEventListener("click", (event) => {
-          let name = event.target.dataset.name;
-          if (name) {
-            saveAs(event.target.src, name);
-          }
-        });
-      }
-
-      img.dataset.name = decodeURIComponent(outputName);
     });
+  }
+
+  img.dataset.name = decodeURIComponent(outputName);
 }
 
 window.addEventListener("error", (event) => {
@@ -618,20 +599,4 @@ function appendRestore() {
 function toggleInput(input, condition) {
   input.disabled = !condition;
   input.parentNode.style.color = condition ? "" : "gray";
-}
-
-if (!Array.prototype.at) {
-  Array.prototype.at = function (index) {
-    if (isNaN(index)) {
-      return undefined;
-    }
-
-    index = parseInt(index);
-
-    if (index < 0) {
-      index += this.length;
-    }
-
-    return this[index];
-  };
 }
