@@ -21,7 +21,7 @@ if (typeof window === "undefined") {
       return;
     }
 
-    console.log(event);
+    // console.log(event);
     let corsRequest;
     if (event.request.url.includes("d2wwh0934dzo2k.cloudfront.net") && event.request.mode === "no-cors") {
       corsRequest = new Request(event.request.url, { mode: "cors" });

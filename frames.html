@@ -6,10 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>frames</title>
     <script src="coi-serviceworker.js"></script>
-    <script src="https://unpkg.com/@ffmpeg/ffmpeg@0.9.8/dist/ffmpeg.min.js" crossorigin></script>
-    <link rel="preload" href="ffmpeg-core.js" />
-    <link rel="preload" href="ffmpeg-core.wasm" />
-    <link rel="preload" href="ffmpeg-core.worker.js" />
+    <script src="https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.10.0/dist/ffmpeg.min.js" crossorigin></script>
     <style>
       .item {
         display: inline-block;
@@ -39,7 +36,10 @@
     </div>
     <p id="progressShow"></p>
     <div id="frames"></div>
-    <img src="" id="webp" />
+    <img src="" id="webp0" />
+    <progress value="0" max="72" id="p0"></progress>
+    <img src="" id="webp1" />
+    <progress value="0" max="72" id="p1"></progress>
     <template id="itemTemplate">
       <figure class="item">
         <img src="" />
@@ -51,29 +51,39 @@
       let progressShow = document.querySelector("#progressShow");
       const { createFFmpeg, fetchFile } = FFmpeg;
       // const ffmpeg = createFFmpeg({ log: true, corePath: "./ffmpeg-core.js" });
-      const ffmpeg = createFFmpeg({ log: true });
+      const ffmpegs = [createFFmpeg({ log: true }), createFFmpeg({ log: true })];
+      ffmpegs.forEach((f, i) => {
+        const bar = document.querySelector(`#p${i}`);
+        f.load();
+        f.setProgress((p) => {
+          console.log(i, p);
+          if (p.duration || p.ratio === Infinity) {
+            return;
+          }
+          bar.value = bar.max / 2 + Math.round((bar.max / 2) * p.ratio);
+        });
+      });
 
+      const ffmpeg = createFFmpeg({ log: true });
       ffmpeg.setLogger((log) => {
         //log.type: info, fferr, ffout
-        console.log(log);
+        // console.log(log);
         // if (log.type == "fferr") {
         progressShow.textContent = log.message;
         // }
       });
-      (async () => {
-        await ffmpeg.load();
-      })();
 
       ffmpeg.setProgress((progress) => {
         console.log(progress);
       });
 
       //교체됨
-      ffmpeg.setLogger((log) => {
-        console.log(log.type, log.message.split(" "));
-      });
+      // ffmpeg.setLogger((log) => {
+      //   console.log(log.type, log.message.split(" "));
+      // });
 
       document.querySelector("#btn1").addEventListener("click", async () => {
+        await ffmpeg.load();
         frames.querySelectorAll("figure").forEach((figure) => {
           URL.revokeObjectURL(figure.querySelector("img").src);
           ffmpeg.FS("unlink", `${figure.querySelector("figcaption").textContent}.jpg`);
@@ -124,54 +134,61 @@
         progressShow.textContent = "";
       });
 
-      document.querySelector("#btn2").addEventListener("click", async () => {
-        let time = Date.now().toString();
-        let dir = time + "가 나 다";
-        let outputName = "라마 a.webp";
+      document.querySelector("#btn2").addEventListener("click", () => {
+        getWebp(0);
+        getWebp(1);
+      });
 
-        ffmpeg.FS("mkdir", encodeURIComponent(dir));
+      async function getWebp(num) {
+        let time = Date.now().toString() + num;
+        let outputName = "a.webp";
+
+        ffmpegs[num].FS("mkdir", time);
         let downloadPromises = [];
-        let rand = getRandomInt(100, 1000);
-        for (let i = 0; i < 18; i++) {
+        let rand = getRandomInt(100, 5000);
+        for (let i = 0; i < 36; i++) {
           let name = `${(rand + i).toString().padStart(5, "0")}.jpg`;
 
           downloadPromises.push(
             new Promise((resolve) => {
               fetchFile(`https://d2wwh0934dzo2k.cloudfront.net/ghibli/07 붉은 돼지 (1992)/${name}`).then((file) => {
-                ffmpeg.FS("writeFile", `${encodeURIComponent(dir)}/${encodeURIComponent(`마 ${name}`)}`, file);
+                ffmpegs[num].FS("writeFile", `${time}/${name}`, file);
+                document.querySelector(`#p${num}`).value += 1;
                 resolve();
               });
             })
           );
-          console.log(name);
         }
 
         await Promise.all(downloadPromises);
-        await ffmpeg.run(
+        await ffmpegs[num].run(
           "-framerate",
           "12",
           "-pattern_type",
           "glob",
           "-i",
-          `${encodeURIComponent(dir)}/*.jpg`,
+          `${time}/*.jpg`,
           "-vf",
           "scale=720:-1",
           "-loop",
           "0",
-          `${encodeURIComponent(dir)}/${encodeURIComponent(outputName)}`
+          `${time}/${outputName}`
         );
-        let webp = ffmpeg.FS("readFile", `${encodeURIComponent(dir)}/${encodeURIComponent(outputName)}`);
-        document.querySelector("#webp").src = URL.createObjectURL(new Blob([webp.buffer], { type: "image/webp" }));
-      });
+        let webp = ffmpegs[num].FS("readFile", `${time}/${outputName}`);
+        document.querySelector(`#webp${num}`).src = URL.createObjectURL(
+          new Blob([webp.buffer], { type: "image/webp" })
+        );
+      }
+
+      function getRandomInt(minInclude, maxExclude) {
+        return Math.floor(Math.random() * (maxExclude - minInclude)) + minInclude;
+      }
       // data = ffmpeg.FS('readFile', 'output.mp4');
       // video = document.createElement("video");
       // video.controls = true;
       // video.autoplay = false;
       // video.src = URL.createObjectURL(new Blob([data.buffer], { type: 'video/mp4' }));
       // document.body.append(video);
-      function getRandomInt(minInclude, maxExclude) {
-        return Math.floor(Math.random() * (maxExclude - minInclude)) + minInclude;
-      }
     </script>
   </body>
 </html>
