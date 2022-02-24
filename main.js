@@ -10,7 +10,7 @@ const fps = 12;
 const webpWidth = 720;
 const gifWidth = 360;
 const { createFFmpeg, fetchFile } = FFmpeg;
-const ffmpeg = createFFmpeg({ log: true });
+const ffmpeg = createFFmpeg({ log: false });
 
 fetch("list.json")
   .then((response) => response.json())
@@ -125,20 +125,6 @@ document.querySelector("#durationSelect").addEventListener("change", (event) => 
 });
 document.querySelector("#webpGifSelect").addEventListener("change", (event) => {
   webpGif = event.target.value;
-  let num4 = document.querySelector("#webpNum input[value='4']");
-  let duration7 = document.querySelector("#durationSelect input[value='7']");
-
-  toggleInput(num4, webpGif == "webp");
-  toggleInput(duration7, webpGif == "webp");
-
-  if (webpGif == "gif") {
-    if (num4.checked) {
-      num4.parentNode.previousElementSibling.click();
-    }
-    if (duration7.checked) {
-      duration7.parentNode.previousElementSibling.click();
-    }
-  }
 });
 document.querySelector("#columnSelect").addEventListener("change", (event) => {
   column = parseInt(event.target.value);
@@ -422,7 +408,8 @@ async function getWebp(params, item) {
     createWebp({ buffer: output.buffer, img, caption, bar, webpGif, outputName });
     clear_ffmpeg(ffmpeg);
   } else if (requestTo == "server") {
-    const socket = io("wss://rosenrose-ghibli-webp.herokuapp.com/");
+    // const socket = io("wss://rosenrose-ghibli-webp.herokuapp.com/");
+    const socket = io("ws://localhost:3000");
     socket.on("load", () => {
       socket.emit("webp", params, (buffer) => {
         createWebp({ buffer, img, caption, bar, webpGif, outputName });
@@ -430,7 +417,7 @@ async function getWebp(params, item) {
       });
     });
     socket.on("progress", (progress) => {
-      // console.log("server", progress);
+      // console.log(socket.id, "progress");
       showProgress(caption, bar, progress);
     });
     socket.on("download", (count) => {
