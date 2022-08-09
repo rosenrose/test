@@ -1,15 +1,15 @@
 {
   "files": {
-    "main.css": "https://github.com/rosenrose/test/static/css/main.13b8de9a.css",
-    "main.js": "https://github.com/rosenrose/test/static/js/main.081258c8.js",
-    "static/js/787.80ff975f.chunk.js": "https://github.com/rosenrose/test/static/js/787.80ff975f.chunk.js",
-    "index.html": "https://github.com/rosenrose/test/index.html",
-    "main.13b8de9a.css.map": "https://github.com/rosenrose/test/static/css/main.13b8de9a.css.map",
-    "main.081258c8.js.map": "https://github.com/rosenrose/test/static/js/main.081258c8.js.map",
-    "787.80ff975f.chunk.js.map": "https://github.com/rosenrose/test/static/js/787.80ff975f.chunk.js.map"
+    "main.css": "https://rosenrose.github.io/test/static/css/main.13b8de9a.css",
+    "main.js": "https://rosenrose.github.io/test/static/js/main.1b15be1f.js",
+    "static/js/787.80ff975f.chunk.js": "https://rosenrose.github.io/test/static/js/787.80ff975f.chunk.js",
+    "index.html": "https://rosenrose.github.io/test/index.html",
+    "main.13b8de9a.css.map": "https://rosenrose.github.io/test/static/css/main.13b8de9a.css.map",
+    "main.1b15be1f.js.map": "https://rosenrose.github.io/test/static/js/main.1b15be1f.js.map",
+    "787.80ff975f.chunk.js.map": "https://rosenrose.github.io/test/static/js/787.80ff975f.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.13b8de9a.css",
-    "static/js/main.081258c8.js"
+    "static/js/main.1b15be1f.js"
   ]
 }
